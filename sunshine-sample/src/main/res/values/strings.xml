@@ -2,5 +2,7 @@
 	<string name="app_name">Sunshine</string>
 	<string name="action_settings">Settings</string>
 
-	<string name="call">Call</string>
+	<string name="call">Veeeeeeeeeeeery long call</string>
+	<string name="message">Veeeeeeeeeeeery long message</string>
+	<string name="done">Veeeeeeeeeeeery long done</string>
 </resources>

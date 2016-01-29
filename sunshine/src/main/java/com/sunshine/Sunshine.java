@@ -2,6 +2,7 @@ package com.sunshine;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
@@ -194,6 +195,9 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 
 		popupWindow.setWidth(width);
 		popupWindow.setHeight(height);
+		if (Build.VERSION.SDK_INT >= 22) {
+			popupWindow.setAttachedInDecor(false);
+		}
 
 		popupWindow.showAtLocation(parentView, Gravity.NO_GRAVITY, x, y);
 
@@ -221,7 +225,7 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		y = (int) event.getRawY();
 
 		if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-			initializeSatelliteMenuCore();
+			initCore();
 		}
 
 		boolean result = core.processMotionEvent(event);
@@ -243,7 +247,7 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		return result;
 	}
 
-	private void initializeSatelliteMenuCore() {
+	private void initCore() {
 		int width;
 		int height;
 		int x;

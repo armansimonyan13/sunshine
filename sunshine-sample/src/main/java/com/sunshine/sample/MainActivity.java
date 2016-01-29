@@ -21,6 +21,8 @@ public class MainActivity extends Activity {
 		sunshine.setWindowCovered(true);
 
 		sunshine.addItem(R.drawable.ic_menu_satellite__call, R.string.call, "call");
+		sunshine.addItem(R.drawable.ic_menu_satellite__message, R.string.message, "message");
+		sunshine.addItem(R.drawable.ic_menu_satellite__done, R.string.done, "done");
 
 		textView.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
