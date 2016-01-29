@@ -1,0 +1,3 @@
+include ':sunshine-sample', ':sunshine'
+
+rootProject.name = "sunshine-parent"

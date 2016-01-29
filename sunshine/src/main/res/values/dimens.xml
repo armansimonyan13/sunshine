@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="menu_satellite__item_radius">25dp</dimen>
+	<dimen name="menu_satellite__max_radius">100dp</dimen>
+	<dimen name="menu_satellite__item_segment">0.7px</dimen>
+</resources>
