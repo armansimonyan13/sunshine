@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("ViewConstructor")
-class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
+class Core extends View implements Item.Parent {
 
 	private final float MAX_SCALE = 1.4f;
 	private final float SEGMENT_ANGLE_RADIAN;// = 0.8f;
@@ -46,10 +46,10 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 	private Paint paint = new Paint();
 	private boolean reversedOrder;
 	private boolean isOpened;
-	private List<SatelliteMenuItem> items = new ArrayList<>();
+	private List<Item> items = new ArrayList<>();
 	private OnItemClickListener onItemClickListener;
 
-	public SatelliteMenuCore(Context context, int itemRadius, int maxRadius, float itemSegment) {
+	public Core(Context context, int itemRadius, int maxRadius, float itemSegment) {
 		super(context);
 
 		ITEM_RADIUS = itemRadius;
@@ -123,7 +123,7 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 		double angle = normalizeAngle(Math.atan2(y - originY, x - originX));
 
 		for (int i = 0; i < items.size(); i++) {
-			SatelliteMenuItem item = items.get(i);
+			Item item = items.get(i);
 			double itemCenterAngle = normalizeAngle(Math.atan2(item.getY() - originY, item.getX() - originX));
 			double itemStartAngle = itemCenterAngle - SEGMENT_ANGLE_RADIAN / 2f;
 			double itemFinishAngle = itemCenterAngle + SEGMENT_ANGLE_RADIAN / 2f;
@@ -231,7 +231,7 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 	                    @StringRes int labelTextResource,
 	                    @ColorRes int highlightColor,
 	                    String tag) {
-		items.add(new SatelliteMenuItem(
+		items.add(new Item(
 				this,
 				BitmapFactory.decodeResource(getResources(), itemBackgroundResource),
 				BitmapFactory.decodeResource(getResources(), itemActiveBackgroundResource),
@@ -299,7 +299,7 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 	}
 
 	private void updateItemCoordinates() {
-		SatelliteMenuItem item;
+		Item item;
 		for (int i = 0; i < items.size(); i++) {
 			float angle = startAngle + i * SEGMENT_ANGLE_RADIAN;
 			int centerX = (int) (originX + radius * Math.cos(angle));
@@ -321,8 +321,8 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
 				radius = ((Number) animation.getAnimatedValue()).floatValue();
-				for (SatelliteMenuItem satelliteMenuItem : items) {
-					satelliteMenuItem.setScale(animation.getAnimatedFraction());
+				for (Item item : items) {
+					item.setScale(animation.getAnimatedFraction());
 				}
 
 				updateItemCoordinates();
@@ -340,8 +340,8 @@ class SatelliteMenuCore extends View implements SatelliteMenuItem.Parent {
 			@Override
 			public void onAnimationEnd(Animator animation) {
 				radius = MAX_RADIUS;
-				for (SatelliteMenuItem satelliteMenuItem : items) {
-					satelliteMenuItem.setScale(1);
+				for (Item item : items) {
+					item.setScale(1);
 				}
 
 				updateItemCoordinates();

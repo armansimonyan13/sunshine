@@ -9,7 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 
-class SatelliteMenuItem {
+class Item {
 
 	private Parent parent;
 	private int x;
@@ -33,15 +33,15 @@ class SatelliteMenuItem {
 	private ValueAnimator zoomOutAnimator;
 	private ValueAnimator zoomInAnimator;
 	private ValueAnimator labelAnimator;
-	public SatelliteMenuItem(Parent parent,
-	                         Bitmap itemBackgroundBitmap,
-	                         Bitmap itemActiveBackgroundBitmap,
-	                         Bitmap itemImageBitmap,
-	                         Bitmap labelBackgroundBitmap,
-	                         String labelTextString,
-	                         int highlightColor,
-	                         int touchMargin,
-	                         String tag) {
+	public Item(Parent parent,
+				Bitmap itemBackgroundBitmap,
+				Bitmap itemActiveBackgroundBitmap,
+				Bitmap itemImageBitmap,
+				Bitmap labelBackgroundBitmap,
+				String labelTextString,
+				int highlightColor,
+				int touchMargin,
+				String tag) {
 		this.parent = parent;
 		this.itemBackgroundBitmap = itemBackgroundBitmap;
 		this.itemActiveBackgroundBitmap = itemActiveBackgroundBitmap;
@@ -242,7 +242,7 @@ class SatelliteMenuItem {
 		zoomInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				SatelliteMenuItem.this.scale = (Float) animation.getAnimatedValue();
+				Item.this.scale = (Float) animation.getAnimatedValue();
 				parent.invalidate();
 			}
 		});

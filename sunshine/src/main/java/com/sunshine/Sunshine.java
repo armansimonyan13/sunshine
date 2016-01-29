@@ -13,14 +13,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
-public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.OnItemClickListener {
+public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener {
 
 	private final int touchBoundaryMargin;
 	private int x;
 	private int y;
 	private PopupWindow popupWindow;
 	private View parentView;
-	private SatelliteMenuCore satelliteMenuCore;
+	private Core core;
 	private View touchBoundary;
 	private OnItemClickListener onItemClickListener;
 	private OnMenuListener onMenuListener;
@@ -117,8 +117,8 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 			return this;
 		}
 
-		public SatelliteMenu build() {
-			return new SatelliteMenu(anchorView, originResource, activeOriginResource,
+		public Sunshine build() {
+			return new Sunshine(anchorView, originResource, activeOriginResource,
 					itemRadiusResource, maxRadiusResource, itemSegmentResource,
 					itemBackgroundResource, itemActiveBackgroundResource, labelBackgroundResource,
 					highlightColorResource);
@@ -126,10 +126,10 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 
 	}
 
-	SatelliteMenu(View view, @DrawableRes int originResource, @DrawableRes int originActiveResource,
-	              @DimenRes int itemRadius, @DimenRes int maxRadius, @DimenRes int itemSegment,
-	              @DrawableRes int itemBackgroundResource, @DrawableRes int itemActiveBackgroundResource,
-	              @DrawableRes int labelBackgroundResource, @ColorRes int highlightColorResource) {
+	Sunshine(View view, @DrawableRes int originResource, @DrawableRes int originActiveResource,
+			 @DimenRes int itemRadius, @DimenRes int maxRadius, @DimenRes int itemSegment,
+			 @DrawableRes int itemBackgroundResource, @DrawableRes int itemActiveBackgroundResource,
+			 @DrawableRes int labelBackgroundResource, @ColorRes int highlightColorResource) {
 		this.parentView = view;
 		this.itemBackgroundResource = itemBackgroundResource;
 		this.itemActiveBackgroundResource = itemActiveBackgroundResource;
@@ -137,13 +137,13 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 		this.highlightColorResource = highlightColorResource;
 
 		popupWindow = new PopupWindow(view);
-		satelliteMenuCore = new SatelliteMenuCore(view.getContext(),
+		core = new Core(view.getContext(),
 				parentView.getResources().getDimensionPixelSize(itemRadius),
 				parentView.getResources().getDimensionPixelSize(maxRadius),
 				parentView.getResources().getDimension(itemSegment));
-		satelliteMenuCore.setOriginResource(originResource);
-		satelliteMenuCore.setOriginActiveResource(originActiveResource);
-		popupWindow.setContentView(satelliteMenuCore);
+		core.setOriginResource(originResource);
+		core.setOriginActiveResource(originActiveResource);
+		popupWindow.setContentView(core);
 		touchBoundaryMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15,
 				parentView.getResources().getDisplayMetrics());
 
@@ -210,7 +210,7 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 			initializeSatelliteMenuCore();
 		}
 
-		boolean result = satelliteMenuCore.processMotionEvent(event);
+		boolean result = core.processMotionEvent(event);
 
 		switch (event.getActionMasked()) {
 			case MotionEvent.ACTION_DOWN:
@@ -251,14 +251,14 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 			y = parentLocation[1];
 		}
 
-		satelliteMenuCore.setParentWidth(width);
-		satelliteMenuCore.setParentHeight(height);
-		satelliteMenuCore.setParentX(x);
-		satelliteMenuCore.setParentY(y);
+		core.setParentWidth(width);
+		core.setParentHeight(height);
+		core.setParentX(x);
+		core.setParentY(y);
 	}
 
 	public void reset() {
-		satelliteMenuCore.reset();
+		core.reset();
 	}
 
 	public void addItem(@DrawableRes int itemBackgroundResource,
@@ -268,7 +268,7 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 	                    @StringRes int labelTextResource,
 	                    @ColorRes int highlightColor,
 	                    String tag) {
-		satelliteMenuCore.addItem(
+		core.addItem(
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,
@@ -279,7 +279,7 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 	}
 
 	public void addItem(@DrawableRes int itemImageResource, @StringRes int labelTextResource, String tag) {
-		satelliteMenuCore.addItem(
+		core.addItem(
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,
@@ -292,7 +292,7 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 	public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
 		this.onItemClickListener = onItemClickListener;
 
-		satelliteMenuCore.setOnItemClickListener(this);
+		core.setOnItemClickListener(this);
 	}
 
 	public void setOnMenuListener(OnMenuListener onMenuListener) {
@@ -300,7 +300,7 @@ public class SatelliteMenu implements View.OnTouchListener, SatelliteMenuCore.On
 	}
 
 	public int getItemCount() {
-		return satelliteMenuCore.getItemCount();
+		return core.getItemCount();
 	}
 
 	@Override

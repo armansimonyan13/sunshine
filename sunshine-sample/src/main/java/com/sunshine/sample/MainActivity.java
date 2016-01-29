@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.sunshine.SatelliteMenu;
+import com.sunshine.Sunshine;
 
 public class MainActivity extends Activity {
 
@@ -16,16 +16,16 @@ public class MainActivity extends Activity {
 
 		final TextView textView = (TextView) findViewById(R.id.text);
 
-		final SatelliteMenu satelliteMenu = new SatelliteMenu.Builder(textView).build();
+		final Sunshine sunshine = new Sunshine.Builder(textView).build();
 
-		satelliteMenu.setWindowCovered(true);
+		sunshine.setWindowCovered(true);
 
-		satelliteMenu.addItem(R.drawable.ic_menu_satellite__call, R.string.call, "call");
+		sunshine.addItem(R.drawable.ic_menu_satellite__call, R.string.call, "call");
 
 		textView.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				satelliteMenu.show();
+				sunshine.show();
 				return false;
 			}
 		});
