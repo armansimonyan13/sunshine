@@ -13,7 +13,21 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
-public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener {
+public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener {
+
+	public interface OnItemSelectListener {
+
+		void onItemSelected(int index, String tag);
+
+	}
+
+	public interface OnActionListener {
+
+		void onMenuShow();
+
+		void onMenuDismiss();
+
+	}
 
 	private final int touchBoundaryMargin;
 	private int x;
@@ -22,8 +36,8 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 	private View parentView;
 	private Core core;
 	private View touchBoundary;
-	private OnItemClickListener onItemClickListener;
-	private OnMenuListener onMenuListener;
+	private OnItemSelectListener onItemSelectListener;
+	private OnActionListener onActionListener;
 	private boolean isWindowCovered;
 
 	@DrawableRes
@@ -126,7 +140,7 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 
 	}
 
-	Sunshine(View view, @DrawableRes int originResource, @DrawableRes int originActiveResource,
+	private Sunshine(View view, @DrawableRes int originResource, @DrawableRes int originActiveResource,
 			 @DimenRes int itemRadius, @DimenRes int maxRadius, @DimenRes int itemSegment,
 			 @DrawableRes int itemBackgroundResource, @DrawableRes int itemActiveBackgroundResource,
 			 @DrawableRes int labelBackgroundResource, @ColorRes int highlightColorResource) {
@@ -183,8 +197,8 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 
 		popupWindow.showAtLocation(parentView, Gravity.NO_GRAVITY, x, y);
 
-		if (onMenuListener != null) {
-			onMenuListener.onMenuShow();
+		if (onActionListener != null) {
+			onActionListener.onMenuShow();
 		}
 	}
 
@@ -220,8 +234,8 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 			default:
 				if (popupWindow.isShowing()) {
 					popupWindow.dismiss();
-					if (onMenuListener != null) {
-						onMenuListener.onMenuDismiss();
+					if (onActionListener != null) {
+						onActionListener.onMenuDismiss();
 					}
 				}
 		}
@@ -289,14 +303,14 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 				tag);
 	}
 
-	public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-		this.onItemClickListener = onItemClickListener;
+	public void setOnItemSelectListener(OnItemSelectListener onItemSelectListener) {
+		this.onItemSelectListener = onItemSelectListener;
 
-		core.setOnItemClickListener(this);
+		core.setOnItemSelectListener(this);
 	}
 
-	public void setOnMenuListener(OnMenuListener onMenuListener) {
-		this.onMenuListener = onMenuListener;
+	public void setOnActionListener(OnActionListener onActionListener) {
+		this.onActionListener = onActionListener;
 	}
 
 	public int getItemCount() {
@@ -304,9 +318,9 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 	}
 
 	@Override
-	public void onItemClicked(int index, String tag) {
+	public void onItemSelected(int index, String tag) {
 		if (popupWindow.isShowing() && isInTouchBoundary()) {
-			onItemClickListener.onItemClicked(index, tag);
+			onItemSelectListener.onItemSelected(index, tag);
 		}
 	}
 
@@ -320,20 +334,6 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemClickListener 
 
 	public void setWindowCovered(boolean isWindowCovered) {
 		this.isWindowCovered = isWindowCovered;
-	}
-
-	public interface OnItemClickListener {
-
-		void onItemClicked(int index, String tag);
-
-	}
-
-	public interface OnMenuListener {
-
-		void onMenuShow();
-
-		void onMenuDismiss();
-
 	}
 
 }

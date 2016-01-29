@@ -25,10 +25,17 @@ import java.util.List;
 @SuppressLint("ViewConstructor")
 class Core extends View implements Item.Parent {
 
+	interface OnItemSelectListener {
+
+		void onItemSelected(int index, String tag);
+
+	}
+
 	private final float MAX_SCALE = 1.4f;
 	private final float SEGMENT_ANGLE_RADIAN;// = 0.8f;
 	private final float MAX_RADIUS;
 	private final int ITEM_RADIUS;
+
 	private int x;
 	private int y;
 	private int originX;
@@ -47,7 +54,7 @@ class Core extends View implements Item.Parent {
 	private boolean reversedOrder;
 	private boolean isOpened;
 	private List<Item> items = new ArrayList<>();
-	private OnItemClickListener onItemClickListener;
+	private OnItemSelectListener onItemSelectListener;
 
 	public Core(Context context, int itemRadius, int maxRadius, float itemSegment) {
 		super(context);
@@ -113,8 +120,8 @@ class Core extends View implements Item.Parent {
 
 		if (event.getAction() == MotionEvent.ACTION_UP) {
 			for (int i = 0; i < items.size(); i++) {
-				if (items.get(i).inCircle(x, y) && items.get(i).isSelected() && isOpened && onItemClickListener != null) {
-					onItemClickListener.onItemClicked(i, items.get(i).getTag());
+				if (items.get(i).inCircle(x, y) && items.get(i).isSelected() && isOpened && onItemSelectListener != null) {
+					onItemSelectListener.onItemSelected(i, items.get(i).getTag());
 					break;
 				}
 			}
@@ -355,18 +362,12 @@ class Core extends View implements Item.Parent {
 		valueAnimator.start();
 	}
 
-	public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-		this.onItemClickListener = onItemClickListener;
+	public void setOnItemSelectListener(OnItemSelectListener onItemSelectListener) {
+		this.onItemSelectListener = onItemSelectListener;
 	}
 
 	public int getItemCount() {
 		return items.size();
-	}
-
-	interface OnItemClickListener {
-
-		public void onItemClicked(int index, String tag);
-
 	}
 
 }
