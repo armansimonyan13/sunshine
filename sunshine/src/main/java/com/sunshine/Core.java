@@ -12,7 +12,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -131,13 +133,13 @@ class Core extends View implements Item.Parent {
 
 		for (int i = 0; i < items.size(); i++) {
 			Item item = items.get(i);
-			double itemCenterAngle = normalizeAngle(Math.atan2(item.getY() - originY, item.getX() - originX));
+			double itemCenterAngle = normalizeAngle(Math.atan2(item.getCy() - originY, item.getCx() - originX));
 			double itemStartAngle = itemCenterAngle - SEGMENT_ANGLE_RADIAN / 2f;
 			double itemFinishAngle = itemCenterAngle + SEGMENT_ANGLE_RADIAN / 2f;
 			boolean inCurrentSegment;
 			if (itemStartAngle < angle && angle < itemFinishAngle) {
-				int dx = x - item.getX();
-				int dy = y - item.getY();
+				int dx = x - item.getCx();
+				int dy = y - item.getCy();
 				double distance = Math.sqrt(dx * dx + dy * dy);
 				float scale = (float) (MAX_SCALE - (MAX_SCALE - 1) * distance / MAX_RADIUS);
 				if (scale < 1) {
@@ -190,16 +192,36 @@ class Core extends View implements Item.Parent {
 		canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
 		if (reversedOrder) {
+			Item selectedItem = null;
 			for (int i = items.size() - 1; i >= 0; i--) {
-				items.get(i).draw(canvas);
+				Item item = items.get(i);
+				item.setIndex(i);
+				if (item.isSelected()) {
+					selectedItem = item;
+				} else {
+					item.draw(canvas);
+				}
+			}
+			if (selectedItem != null) {
+				selectedItem.draw(canvas);
 			}
 		} else {
+			Item selectedItem = null;
 			for (int i = 0; i < items.size(); i++) {
-				items.get(i).draw(canvas);
+				Item item = items.get(i);
+				item.setIndex(i);
+				if (item.isSelected()) {
+					selectedItem = item;
+				} else {
+					item.draw(canvas);
+				}
+			}
+			if (selectedItem != null) {
+				selectedItem.draw(canvas);
 			}
 		}
 
-//		renderLines(canvas);
+		renderLines(canvas);
 	}
 
 	private boolean isInOrigin(int x, int y) {
@@ -215,7 +237,7 @@ class Core extends View implements Item.Parent {
 		paint.setStrokeWidth(1);
 		paint.setAntiAlias(true);
 		for (int i = 0; i < items.size(); i++) {
-			canvas.drawLine(originX, originY, items.get(i).getX(), items.get(i).getY(), paint);
+			canvas.drawLine(originX, originY, items.get(i).getCx(), items.get(i).getCy(), paint);
 		}
 	}
 
@@ -231,21 +253,35 @@ class Core extends View implements Item.Parent {
 		items.clear();
 	}
 
-	public void addItem(@DrawableRes int itemBackgroundResource,
-	                    @DrawableRes int itemActiveBackgroundResource,
-	                    @DrawableRes int itemImageResource,
-	                    @DrawableRes int labelBackgroundResource,
-	                    @StringRes int labelTextResource,
-	                    @ColorRes int highlightColor,
-	                    String tag) {
+	public void addItem(
+			@DimenRes @IntegerRes int itemWidthResource,
+			@DimenRes @IntegerRes int itemHeightResource,
+			@DimenRes @IntegerRes int labelWidthResource,
+			@DimenRes @IntegerRes int labelHeightResource,
+			@DimenRes @IntegerRes int labelBottomMarginResource,
+			@DimenRes @IntegerRes int textSizeResource,
+			@DrawableRes int itemBackgroundResource,
+			@DrawableRes int itemActiveBackgroundResource,
+			@DrawableRes int itemImageResource,
+			@DrawableRes int labelBackgroundResource,
+			@StringRes int labelTextResource,
+			@ColorRes int highlightColor,
+			String tag) {
 		items.add(new Item(
 				this,
-				BitmapFactory.decodeResource(getResources(), itemBackgroundResource),
-				BitmapFactory.decodeResource(getResources(), itemActiveBackgroundResource),
-				BitmapFactory.decodeResource(getResources(), itemImageResource),
-				BitmapFactory.decodeResource(getResources(), labelBackgroundResource),
-				getResources().getString(labelTextResource),
-				getResources().getColor(highlightColor),
+				getResources(),
+				itemWidthResource,
+				itemHeightResource,
+				labelWidthResource,
+				labelHeightResource,
+				labelBottomMarginResource,
+				textSizeResource,
+				itemBackgroundResource,
+				itemActiveBackgroundResource,
+				itemImageResource,
+				labelBackgroundResource,
+				labelTextResource,
+				highlightColor,
 				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics()),
 				tag
 		));
@@ -312,7 +348,7 @@ class Core extends View implements Item.Parent {
 			int centerX = (int) (originX + radius * Math.cos(angle));
 			int centerY = (int) (originY + radius * Math.sin(angle));
 			item = items.get(i);
-			item.update(centerX, centerY, ITEM_RADIUS);
+			item.setCenter(centerX, centerY);
 		}
 	}
 

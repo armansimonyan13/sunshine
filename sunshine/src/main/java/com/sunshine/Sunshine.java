@@ -279,14 +279,21 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		core.reset();
 	}
 
-	public void addItem(@DrawableRes int itemBackgroundResource,
-	                    @DrawableRes int itemActiveBackgroundResource,
-	                    @DrawableRes int itemImageResource,
-	                    @DrawableRes int labelBackgroundResource,
-	                    @StringRes int labelTextResource,
-	                    @ColorRes int highlightColor,
-	                    String tag) {
+	public void addItem(
+			@DrawableRes int itemBackgroundResource,
+			@DrawableRes int itemActiveBackgroundResource,
+			@DrawableRes int itemImageResource,
+			@DrawableRes int labelBackgroundResource,
+			@StringRes int labelTextResource,
+			@ColorRes int highlightColor,
+			String tag) {
 		core.addItem(
+				R.dimen.item_width,
+				R.dimen.item_height,
+				R.integer.label_width,
+				R.dimen.label_height,
+				R.dimen.label_bottom_margin,
+				R.dimen.text_size,
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,
@@ -297,7 +304,7 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 	}
 
 	public void addItem(@DrawableRes int itemImageResource, @StringRes int labelTextResource, String tag) {
-		core.addItem(
+		addItem(
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,
