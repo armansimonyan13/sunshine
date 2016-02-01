@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("ViewConstructor")
-class Core extends View implements Item.Parent {
+class Core extends View implements Ray.Parent {
 
 	interface OnItemSelectListener {
 
@@ -54,7 +54,7 @@ class Core extends View implements Item.Parent {
 	private Paint paint = new Paint();
 	private boolean reversedOrder;
 	private boolean isOpened;
-	private List<Item> items = new ArrayList<>();
+	private List<Ray> rays = new ArrayList<>();
 	private OnItemSelectListener onItemSelectListener;
 	private int selectedItemIndex;
 
@@ -121,9 +121,9 @@ class Core extends View implements Item.Parent {
 		}
 
 		if (event.getAction() == MotionEvent.ACTION_UP) {
-			for (int i = 0; i < items.size(); i++) {
-				if (items.get(i).inCircle(x, y) && items.get(i).isSelected() && isOpened && onItemSelectListener != null) {
-					onItemSelectListener.onItemSelected(i, items.get(i).getTag());
+			for (int i = 0; i < rays.size(); i++) {
+				if (rays.get(i).inCircle(x, y) && rays.get(i).isSelected() && isOpened && onItemSelectListener != null) {
+					onItemSelectListener.onItemSelected(i, rays.get(i).getTag());
 					break;
 				}
 			}
@@ -131,40 +131,40 @@ class Core extends View implements Item.Parent {
 
 		double angle = normalizeAngle(Math.atan2(y - originY, x - originX));
 
-		for (int i = 0; i < items.size(); i++) {
-			Item item = items.get(i);
-			double itemCenterAngle = normalizeAngle(Math.atan2(item.getBodyCenterY() - originY, item.getBodyCenterX() - originX));
+		for (int i = 0; i < rays.size(); i++) {
+			Ray ray = rays.get(i);
+			double itemCenterAngle = normalizeAngle(Math.atan2(ray.getBodyCenterY() - originY, ray.getBodyCenterX() - originX));
 			double itemStartAngle = itemCenterAngle - SEGMENT_ANGLE_RADIAN / 2f;
 			double itemFinishAngle = itemCenterAngle + SEGMENT_ANGLE_RADIAN / 2f;
 			boolean inCurrentSegment;
 			if (itemStartAngle < angle && angle < itemFinishAngle) {
-				int dx = x - item.getBodyCenterX();
-				int dy = y - item.getBodyCenterY();
+				int dx = x - ray.getBodyCenterX();
+				int dy = y - ray.getBodyCenterY();
 				double distance = Math.sqrt(dx * dx + dy * dy);
 				float scale = (float) (MAX_SCALE - (MAX_SCALE - 1) * distance / MAX_RADIUS);
 				if (scale < 1) {
 					scale = 1;
 				}
-				if (item.isScaled()) {
-					item.setScale(scale);
+				if (ray.isScaled()) {
+					ray.setScale(scale);
 				} else {
-					item.zoomInAnimated(scale);
+					ray.zoomInAnimated(scale);
 				}
 				inCurrentSegment = true;
 			} else {
 				if (isOpened) {
-					if (item.isScaled()) {
-						item.zoomOutAnimated();
+					if (ray.isScaled()) {
+						ray.zoomOutAnimated();
 					}
 				}
 				inCurrentSegment = false;
 			}
 
 			if (isOpened) {
-				if (item.inCircle(x, y)) {
-					item.setSelected(inCurrentSegment);
+				if (ray.inCircle(x, y)) {
+					ray.setSelected(inCurrentSegment);
 				} else {
-					item.setSelected(false);
+					ray.setSelected(false);
 				}
 			}
 		}
@@ -192,27 +192,27 @@ class Core extends View implements Item.Parent {
 		canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
 		if (reversedOrder) {
-			for (int i = items.size() - 1; i >= 0; i--) {
-				Item item = items.get(i);
-				item.setIndex(i);
-				if (item.isSelected()) {
+			for (int i = rays.size() - 1; i >= 0; i--) {
+				Ray ray = rays.get(i);
+				ray.setIndex(i);
+				if (ray.isSelected()) {
 					selectedItemIndex = i;
 				} else {
-					item.draw(canvas);
+					ray.draw(canvas);
 				}
 			}
-			items.get(selectedItemIndex).draw(canvas);
+			rays.get(selectedItemIndex).draw(canvas);
 		} else {
-			for (int i = 0; i < items.size(); i++) {
-				Item item = items.get(i);
-				item.setIndex(i);
-				if (item.isSelected()) {
+			for (int i = 0; i < rays.size(); i++) {
+				Ray ray = rays.get(i);
+				ray.setIndex(i);
+				if (ray.isSelected()) {
 					selectedItemIndex = i;
 				} else {
-					item.draw(canvas);
+					ray.draw(canvas);
 				}
 			}
-			items.get(selectedItemIndex).draw(canvas);
+			rays.get(selectedItemIndex).draw(canvas);
 		}
 
 //		renderLines(canvas);
@@ -230,8 +230,8 @@ class Core extends View implements Item.Parent {
 		paint.setColor(Color.GREEN);
 		paint.setStrokeWidth(1);
 		paint.setAntiAlias(true);
-		for (int i = 0; i < items.size(); i++) {
-			canvas.drawLine(originX, originY, items.get(i).getBodyCenterX(), items.get(i).getBodyCenterY(), paint);
+		for (int i = 0; i < rays.size(); i++) {
+			canvas.drawLine(originX, originY, rays.get(i).getBodyCenterX(), rays.get(i).getBodyCenterY(), paint);
 		}
 	}
 
@@ -244,7 +244,7 @@ class Core extends View implements Item.Parent {
 	}
 
 	public void reset() {
-		items.clear();
+		rays.clear();
 	}
 
 	public void addItem(
@@ -262,7 +262,7 @@ class Core extends View implements Item.Parent {
 			@StringRes int labelTextResource,
 			@ColorRes int highlightColor,
 			String tag) {
-		items.add(new Item(
+		rays.add(new Ray(
 				this,
 				getResources(),
 				itemWidthResource,
@@ -286,9 +286,9 @@ class Core extends View implements Item.Parent {
 	}
 
 	private void calculateStartAngle() {
-		offsetX = (int) (MAX_SCALE * items.get(0).getWidth() / 2f);
+		offsetX = (int) (MAX_SCALE * rays.get(0).getWidth() / 2f);
 
-		final float startAngleOffset = (items.size() - 1) * 0.5f * SEGMENT_ANGLE_RADIAN;
+		final float startAngleOffset = (rays.size() - 1) * 0.5f * SEGMENT_ANGLE_RADIAN;
 		startAngle = (float) (1.5 * Math.PI) - startAngleOffset;
 
 		if (tooCloseToTopEdge()) {
@@ -311,7 +311,7 @@ class Core extends View implements Item.Parent {
 			if (acos < -1) {
 				acos++;
 			}
-			startAngle = (float) ((2 * Math.PI - Math.acos(acos)) - (items.size() - 1) * SEGMENT_ANGLE_RADIAN);
+			startAngle = (float) ((2 * Math.PI - Math.acos(acos)) - (rays.size() - 1) * SEGMENT_ANGLE_RADIAN);
 			reversedOrder = true;
 		} else {
 			reversedOrder = false;
@@ -323,11 +323,11 @@ class Core extends View implements Item.Parent {
 	}
 
 	private int getItemHeight() {
-		return items.get(0).getHeight();
+		return rays.get(0).getHeight();
 	}
 
 	private boolean tooCloseToRightEdge() {
-		return Math.abs(MAX_RADIUS * Math.cos(startAngle + (items.size() - 1)
+		return Math.abs(MAX_RADIUS * Math.cos(startAngle + (rays.size() - 1)
 				* SEGMENT_ANGLE_RADIAN)) + originX + offsetX > getParentWidth();
 	}
 
@@ -344,13 +344,13 @@ class Core extends View implements Item.Parent {
 	}
 
 	private void updateItemCoordinates() {
-		Item item;
-		for (int i = 0; i < items.size(); i++) {
+		Ray ray;
+		for (int i = 0; i < rays.size(); i++) {
 			float angle = startAngle + i * SEGMENT_ANGLE_RADIAN;
 			int centerX = (int) (originX + radius * Math.cos(angle));
 			int centerY = (int) (originY + radius * Math.sin(angle));
-			item = items.get(i);
-			item.setBodyCenter(centerX, centerY);
+			ray = rays.get(i);
+			ray.setBodyCenter(centerX, centerY);
 		}
 	}
 
@@ -366,8 +366,8 @@ class Core extends View implements Item.Parent {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
 				radius = ((Number) animation.getAnimatedValue()).floatValue();
-				for (Item item : items) {
-					item.setScale(animation.getAnimatedFraction());
+				for (Ray ray : rays) {
+					ray.setScale(animation.getAnimatedFraction());
 				}
 
 				updateItemCoordinates();
@@ -385,8 +385,8 @@ class Core extends View implements Item.Parent {
 			@Override
 			public void onAnimationEnd(Animator animation) {
 				radius = MAX_RADIUS;
-				for (Item item : items) {
-					item.setScale(1);
+				for (Ray ray : rays) {
+					ray.setScale(1);
 				}
 
 				updateItemCoordinates();
@@ -405,7 +405,7 @@ class Core extends View implements Item.Parent {
 	}
 
 	public int getItemCount() {
-		return items.size();
+		return rays.size();
 	}
 
 }

@@ -16,7 +16,7 @@ import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
 import android.util.TypedValue;
 
-class Item {
+class Ray {
 
 	private Parent parent;
 	private Resources resources;
@@ -52,7 +52,7 @@ class Item {
 
 	private int index; // for test
 
-	public Item(
+	public Ray(
 			Parent parent,
 			Resources resources,
 			@DimenRes @IntegerRes int bodyWidthResource,
@@ -146,7 +146,7 @@ class Item {
 	/**
 	 * Do not modify this method
 	 * If you need to change drawing of this object
-	 * consider to change {@link Item#update()} or {@link Item#render()}
+	 * consider to change {@link Ray#update()} or {@link Ray#render()}
 	 */
 	public final void draw(Canvas c) {
 		update();
@@ -352,7 +352,7 @@ class Item {
 		zoomInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				Item.this.scale = (Float) animation.getAnimatedValue();
+				Ray.this.scale = (Float) animation.getAnimatedValue();
 				parent.invalidate();
 			}
 		});
