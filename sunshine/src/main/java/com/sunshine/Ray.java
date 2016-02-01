@@ -19,12 +19,12 @@ import android.util.TypedValue;
 class Ray {
 
 	private Parent parent;
-	private Resources resources;
 	private String tag;
 
 	private int bodyWidth;
 	private int bodyHeight;
-	private int touchMargin;
+	private int bodyPadding;
+	private int bodyTouchMargin;
 	private int labelWidth;
 	private int labelHeight;
 	private int labelBottomMargin;
@@ -57,7 +57,8 @@ class Ray {
 			Resources resources,
 			@DimenRes @IntegerRes int bodyWidthResource,
 			@DimenRes @IntegerRes int bodyHeightResource,
-			@DimenRes @IntegerRes int touchMarginResource,
+			@DimenRes @IntegerRes int bodyTouchMarginResource,
+			@DimenRes @IntegerRes int bodyPaddingResource,
 			@DimenRes @IntegerRes int labelWidthResource,
 			@DimenRes @IntegerRes int labelHeightResource,
 			@DimenRes @IntegerRes int labelBottomMarginResource,
@@ -70,7 +71,6 @@ class Ray {
 			@ColorRes int highlightColorResource,
 			String tag) {
 		this.parent = parent;
-		this.resources = resources;
 		this.labelTextString = resources.getString(labelTextResource);
 		this.highlightColor = resources.getColor(highlightColorResource);
 		this.tag = tag;
@@ -85,10 +85,15 @@ class Ray {
 		} else if ("integer".equals(resources.getResourceTypeName(bodyHeightResource))) {
 			bodyHeight = resources.getInteger(bodyWidthResource);
 		}
-		if ("dimen".equals(resources.getResourceTypeName(touchMarginResource))) {
-			this.touchMargin = resources.getDimensionPixelSize(touchMarginResource);
-		} else if ("integer".equals(resources.getResourceTypeName(touchMarginResource))) {
-			this.touchMargin = resources.getInteger(touchMarginResource);
+		if ("dimen".equals(resources.getResourceTypeName(bodyTouchMarginResource))) {
+			this.bodyTouchMargin = resources.getDimensionPixelSize(bodyTouchMarginResource);
+		} else if ("integer".equals(resources.getResourceTypeName(bodyTouchMarginResource))) {
+			this.bodyTouchMargin = resources.getInteger(bodyTouchMarginResource);
+		}
+		if ("dimen".equals(resources.getResourceTypeName(bodyPaddingResource))) {
+			this.bodyPadding = resources.getDimensionPixelSize(bodyPaddingResource);
+		} else if ("integer".equals(resources.getResourceTypeName(bodyPaddingResource))) {
+			this.bodyPadding = resources.getInteger(bodyPaddingResource);
 		}
 		if ("dimen".equals(resources.getResourceTypeName(labelWidthResource))) {
 			labelWidth = resources.getDimensionPixelSize(labelWidthResource);
@@ -194,10 +199,22 @@ class Ray {
 			bodyBackgroundDrawable.setBounds(left, top, left + bodyWidth, top + bodyHeight);
 			bodyBackgroundDrawable.draw(canvas);
 		}
-		int bodyPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, resources.getDisplayMetrics()); // Todo: change padding to be injected
-		int left = (int) (cx - (bodyWidth - bodyPadding) / 2f);
-		int top = (int) (cy - (bodyHeight - bodyPadding) / 2f);
-		bodyImageDrawable.setBounds(left, top, left + bodyWidth - bodyPadding, top + bodyHeight - bodyPadding);
+		int imageWidth = bodyImageDrawable.getIntrinsicWidth();
+		int imageHeight = bodyImageDrawable.getIntrinsicHeight();
+		int top, left;
+		float widthScaleFactor = (bodyWidth - 2f * bodyPadding) / imageWidth;
+		float heightScaleFactor = (bodyHeight - 2f * bodyPadding) / imageHeight;
+		float scaleFactor;
+		if (widthScaleFactor < heightScaleFactor) {
+			scaleFactor = widthScaleFactor;
+		} else {
+			scaleFactor = heightScaleFactor;
+		}
+		int scaledImageWidth = (int) (scaleFactor * imageWidth);
+		int scaledImageHeight = (int) (scaleFactor * imageHeight);
+		left = (int) (cx - scaledImageWidth / 2f);
+		top = (int) (cy - scaledImageHeight / 2f);
+		bodyImageDrawable.setBounds(left, top, left + scaledImageWidth, top + scaledImageHeight);
 		bodyImageDrawable.draw(canvas);
 
 		if (labelScale > 0) {
@@ -362,7 +379,7 @@ class Ray {
 	public boolean inCircle(int x, int y) {
 		int dx = x - this.bodyCenterX;
 		int dy = y - this.bodyCenterY;
-		return Math.sqrt(dx * dx + dy * dy) <= scale * bodyWidth / 2f + touchMargin;
+		return Math.sqrt(dx * dx + dy * dy) <= scale * bodyWidth / 2f + bodyTouchMargin;
 	}
 
 	public boolean isScaled() {

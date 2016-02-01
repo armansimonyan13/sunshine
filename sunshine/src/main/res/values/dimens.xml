@@ -10,5 +10,6 @@
 	<dimen name="label_height">28dp</dimen>
 	<dimen name="label_bottom_margin">0dp</dimen>
 	<dimen name="text_size">11sp</dimen>
-	<dimen name="touch_margin">30dp</dimen>
+	<dimen name="body_touch_margin">30dp</dimen>
+	<dimen name="body_padding">14dp</dimen>
 </resources>
