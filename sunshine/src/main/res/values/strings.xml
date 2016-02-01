@@ -1,3 +1,5 @@
 <resources>
 	<string name="app_name">sunshine</string>
+
+	<string name="label_text">label</string>
 </resources>

@@ -392,4 +392,70 @@ class Ray {
 
 	}
 
+	public class Builder {
+
+		private Parent parent;
+		private Resources resources;
+
+		private int bodyWidthResource;
+		private int bodyHeightResource;
+		private int bodyPaddingResource;
+		private int bodyTouchMarginResource;
+		private int labelWidthResource;
+		private int labelHeightResource;
+		private int labelBottomMarginResource;
+		private int labelTextSizeResource;
+		private int bodyBackgroundDrawableResource;
+		private int bodyActiveBackgroundDrawableResource;
+		private int bodyImageDrawableResource;
+		private int labelBackgroundDrawableResource;
+		private int labelTextStringResource;
+		private int highlightColorResource;
+
+		private String tag;
+
+		public Builder(Parent parent, Resources resources) {
+			this.parent = parent;
+			this.resources = resources;
+
+			bodyWidthResource = R.dimen.body_width;
+			bodyHeightResource = R.dimen.body_height;
+			bodyPaddingResource = R.dimen.body_padding;
+			bodyTouchMarginResource = R.dimen.body_touch_margin;
+			labelWidthResource = R.integer.label_width;
+			labelHeightResource = R.dimen.label_height;
+			labelBottomMarginResource = R.dimen.label_bottom_margin;
+			labelTextSizeResource = R.dimen.label_text_size;
+			bodyBackgroundDrawableResource = R.drawable.body_backgroud;
+			bodyActiveBackgroundDrawableResource = R.drawable.body_activie_background;
+			bodyImageDrawableResource = R.drawable.body_image;
+			labelBackgroundDrawableResource = R.drawable.label_background;
+			labelTextStringResource = R.string.label_text;
+			highlightColorResource = R.color.highlight_color;
+		}
+
+		public Ray build() {
+			return new Ray(
+					parent,
+					resources,
+					bodyWidthResource,
+					bodyHeightResource,
+					bodyTouchMarginResource,
+					bodyPaddingResource,
+					labelWidthResource,
+					labelHeightResource,
+					labelBottomMarginResource,
+					labelTextSizeResource,
+					bodyBackgroundDrawableResource,
+					bodyActiveBackgroundDrawableResource,
+					bodyImageDrawableResource,
+					labelBackgroundDrawableResource,
+					labelTextStringResource,
+					highlightColorResource,
+					tag
+			);
+		}
+
+	}
+
 }

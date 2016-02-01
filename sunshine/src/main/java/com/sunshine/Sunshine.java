@@ -50,6 +50,10 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 	@ColorRes
 	private int highlightColorResource;
 
+	public static Builder forView(View view) {
+		return new Builder(view);
+	}
+
 	public static class Builder {
 
 		private View anchorView;
@@ -57,8 +61,8 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		private int originResource;
 		@DrawableRes
 		private int activeOriginResource;
-		@DimenRes
-		private int itemRadiusResource;
+		private int itemWidthResource;
+		private int itemHeightResource;
 		@DimenRes
 		private int maxRadiusResource;
 		@DimenRes
@@ -72,19 +76,23 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		@ColorRes
 		private int highlightColorResource;
 
+		private boolean isWindowCovered;
+
 		public Builder(View view) {
 			this.anchorView = view;
 
 			originResource = R.drawable.ic_menu_satellite__origin;
 			activeOriginResource = R.drawable.ic_menu_satellite__origin_active;
-			itemRadiusResource = R.dimen.menu_satellite__item_radius;
+			itemWidthResource = R.dimen.body_width;
+			itemHeightResource = R.dimen.body_height;
 			maxRadiusResource = R.dimen.menu_satellite__max_radius;
 			itemSegmentResource = R.dimen.menu_satellite__item_segment;
 
-			itemBackgroundResource = R.drawable.ic_menu_satellite_image_background;
-			itemActiveBackgroundResource = R.drawable.ic_menu_satellite_image_background_active;
-			labelBackgroundResource = R.drawable.ic_menu_satellite_text_background;
-			highlightColorResource = R.color.orange;
+			itemBackgroundResource = R.drawable.body_backgroud;
+			itemActiveBackgroundResource = R.drawable.body_activie_background;
+			labelBackgroundResource = R.drawable.label_background;
+			highlightColorResource = R.color.highlight_color;
+			isWindowCovered = true;
 		}
 
 		public Builder setOriginResource(@DrawableRes int originResource) {
@@ -94,11 +102,6 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 
 		public Builder setActiveOriginResource(@DrawableRes int activeOriginResource) {
 			this.activeOriginResource = activeOriginResource;
-			return this;
-		}
-
-		public Builder setItemRadiusResource(@DimenRes int itemRadiusResource) {
-			this.itemRadiusResource = itemRadiusResource;
 			return this;
 		}
 
@@ -133,27 +136,48 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 		}
 
 		public Sunshine build() {
-			return new Sunshine(anchorView, originResource, activeOriginResource,
-					itemRadiusResource, maxRadiusResource, itemSegmentResource,
-					itemBackgroundResource, itemActiveBackgroundResource, labelBackgroundResource,
-					highlightColorResource);
+			return new Sunshine(
+					anchorView,
+					originResource,
+					activeOriginResource,
+					itemWidthResource,
+					itemHeightResource,
+					maxRadiusResource,
+					itemSegmentResource,
+					itemBackgroundResource,
+					itemActiveBackgroundResource,
+					labelBackgroundResource,
+					highlightColorResource,
+					isWindowCovered);
 		}
 
 	}
 
-	private Sunshine(View view, @DrawableRes int originResource, @DrawableRes int originActiveResource,
-			 @DimenRes int itemRadius, @DimenRes int maxRadius, @DimenRes int itemSegment,
-			 @DrawableRes int itemBackgroundResource, @DrawableRes int itemActiveBackgroundResource,
-			 @DrawableRes int labelBackgroundResource, @ColorRes int highlightColorResource) {
+	private Sunshine(
+			View view,
+			@DrawableRes int originResource,
+			@DrawableRes int originActiveResource,
+			@DimenRes int itemWidth,
+			@DimenRes int itemHeight,
+			@DimenRes int maxRadius,
+			@DimenRes int itemSegment,
+			@DrawableRes int itemBackgroundResource,
+			@DrawableRes int itemActiveBackgroundResource,
+			@DrawableRes int labelBackgroundResource,
+			@ColorRes int highlightColorResource,
+			boolean isWindowCovered) {
 		this.parentView = view;
 		this.itemBackgroundResource = itemBackgroundResource;
 		this.itemActiveBackgroundResource = itemActiveBackgroundResource;
 		this.labelBackgroundResource = labelBackgroundResource;
 		this.highlightColorResource = highlightColorResource;
+		this.isWindowCovered = isWindowCovered;
 
 		popupWindow = new PopupWindow(view);
-		core = new Core(view.getContext(),
-				parentView.getResources().getDimensionPixelSize(itemRadius),
+		core = new Core(
+				view.getContext(),
+				parentView.getResources().getDimensionPixelSize(itemWidth),
+				parentView.getResources().getDimensionPixelSize(itemHeight),
 				parentView.getResources().getDimensionPixelSize(maxRadius),
 				parentView.getResources().getDimension(itemSegment));
 		core.setOriginResource(originResource);
@@ -295,7 +319,7 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 				R.integer.label_width,
 				R.dimen.label_height,
 				R.dimen.label_bottom_margin,
-				R.dimen.text_size,
+				R.dimen.label_text_size,
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,

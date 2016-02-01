@@ -35,7 +35,6 @@ class Core extends View implements Ray.Parent {
 	private final float MAX_SCALE = 1.4f;
 	private final float SEGMENT_ANGLE_RADIAN;// = 0.8f;
 	private final float MAX_RADIUS;
-	private final int ITEM_RADIUS;
 
 	private int x;
 	private int y;
@@ -57,11 +56,20 @@ class Core extends View implements Ray.Parent {
 	private List<Ray> rays = new ArrayList<>();
 	private OnItemSelectListener onItemSelectListener;
 	private int selectedItemIndex;
+	private int rayWidth;
+	private int rayHeight;
 
-	public Core(Context context, int itemRadius, int maxRadius, float itemSegment) {
+	public Core(
+			Context context,
+			int width,
+			int height,
+			int maxRadius,
+			float itemSegment) {
 		super(context);
 
-		ITEM_RADIUS = itemRadius;
+		this.rayWidth = width;
+		this.rayHeight = height;
+
 		MAX_RADIUS = maxRadius;
 		SEGMENT_ANGLE_RADIAN = itemSegment;
 	}
@@ -188,7 +196,9 @@ class Core extends View implements Ray.Parent {
 			bitmap = originBitmap;
 		}
 		Rect srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		Rect dstRect = new Rect(originX - ITEM_RADIUS, originY - ITEM_RADIUS, originX + ITEM_RADIUS, originY + ITEM_RADIUS);
+		int left = (int) (originX - rayWidth / 2f);
+		int top =  (int) (originY - rayHeight / 2f);
+		Rect dstRect = new Rect(left, top, left + rayWidth, top + rayHeight);
 		canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
 		if (reversedOrder) {
@@ -221,7 +231,7 @@ class Core extends View implements Ray.Parent {
 	private boolean isInOrigin(int x, int y) {
 		int dx = x - originX;
 		int dy = y - originY;
-		return Math.sqrt(dx * dx + dy * dy) <= ITEM_RADIUS;
+		return Math.sqrt(dx * dx + dy * dy) <= rayWidth / 2f;
 	}
 
 	@SuppressWarnings("unused")

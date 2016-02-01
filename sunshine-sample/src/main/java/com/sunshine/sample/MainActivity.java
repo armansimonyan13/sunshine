@@ -16,9 +16,8 @@ public class MainActivity extends Activity {
 
 		final TextView textView = (TextView) findViewById(R.id.text);
 
-		final Sunshine sunshine = new Sunshine.Builder(textView).build();
-
-		sunshine.setWindowCovered(true);
+		final Sunshine sunshine = Sunshine.forView(textView)
+				.build();
 
 		sunshine.addItem(R.drawable.ic_menu_satellite__call, R.string.call, "call");
 		sunshine.addItem(R.drawable.ic_menu_satellite__message, R.string.message, "message");
