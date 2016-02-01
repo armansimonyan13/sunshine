@@ -9,30 +9,35 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
+import android.support.annotation.StringRes;
 import android.util.TypedValue;
 
 class Item {
 
 	private Parent parent;
 	private Resources resources;
-	private int touchMargin;
 	private String tag;
 
-	private int itemWidth;
-	private int itemHeight;
+	private int bodyWidth;
+	private int bodyHeight;
+	private int touchMargin;
 	private int labelWidth;
 	private int labelHeight;
 	private int labelBottomMargin;
 	private int labelTextSize;
-	private Drawable itemBackgroundDrawable;
-	private Drawable itemActiveBackgroundDrawable;
-	private Drawable itemImageDrawable;
+	private Drawable bodyBackgroundDrawable;
+	private Drawable bodyActiveBackgroundDrawable;
+	private Drawable bodyImageDrawable;
 	private Drawable labelBackgroundDrawable;
 	private String labelTextString;
 	private int highlightColor;
 
-	private int cx;
-	private int cy;
+	private int bodyCenterX;
+	private int bodyCenterY;
 	private int width;
 	private int height;
 	private float scale = 1;
@@ -45,44 +50,45 @@ class Item {
 	private ValueAnimator zoomInAnimator;
 	private ValueAnimator labelAnimator;
 
-	private int labelTextWidth;
-
-	private Rect srcRect;
-	private Rect dstRect;
-
 	private int index; // for test
 
 	public Item(
 			Parent parent,
 			Resources resources,
-			int itemWidthResource,
-			int itemHeightResource,
-			int labelWidthResource,
-			int labelHeightResource,
-			int labelBottomMarginResource,
-			int labelTextSizeResource,
-			int itemBackgroundResource,
-			int itemActiveBackgroundResource,
-			int itemImageResource,
-			int labelBackgroundResource,
-			int labelTextResource,
-			int highlightColorResource,
-			int touchMargin,
+			@DimenRes @IntegerRes int bodyWidthResource,
+			@DimenRes @IntegerRes int bodyHeightResource,
+			@DimenRes @IntegerRes int touchMarginResource,
+			@DimenRes @IntegerRes int labelWidthResource,
+			@DimenRes @IntegerRes int labelHeightResource,
+			@DimenRes @IntegerRes int labelBottomMarginResource,
+			@DimenRes @IntegerRes int labelTextSizeResource,
+			@DrawableRes int bodyBackgroundResource,
+			@DrawableRes int bodyActiveBackgroundResource,
+			@DrawableRes int bodyImageResource,
+			@DrawableRes int labelBackgroundResource,
+			@StringRes int labelTextResource,
+			@ColorRes int highlightColorResource,
 			String tag) {
 		this.parent = parent;
 		this.resources = resources;
-		this.touchMargin = touchMargin;
+		this.labelTextString = resources.getString(labelTextResource);
+		this.highlightColor = resources.getColor(highlightColorResource);
 		this.tag = tag;
 
-		if ("dimen".equals(resources.getResourceTypeName(itemWidthResource))) {
-			itemWidth = resources.getDimensionPixelSize(itemWidthResource);
-		} else if ("integer".equals(resources.getResourceTypeName(itemWidthResource))) {
-			itemWidth = resources.getInteger(itemWidthResource);
+		if ("dimen".equals(resources.getResourceTypeName(bodyWidthResource))) {
+			bodyWidth = resources.getDimensionPixelSize(bodyWidthResource);
+		} else if ("integer".equals(resources.getResourceTypeName(bodyWidthResource))) {
+			bodyWidth = resources.getInteger(bodyWidthResource);
 		}
-		if ("dimen".equals(resources.getResourceTypeName(itemHeightResource))) {
-			itemHeight = resources.getDimensionPixelSize(itemWidthResource);
-		} else if ("integer".equals(resources.getResourceTypeName(itemHeightResource))) {
-			itemHeight = resources.getInteger(itemWidthResource);
+		if ("dimen".equals(resources.getResourceTypeName(bodyHeightResource))) {
+			bodyHeight = resources.getDimensionPixelSize(bodyWidthResource);
+		} else if ("integer".equals(resources.getResourceTypeName(bodyHeightResource))) {
+			bodyHeight = resources.getInteger(bodyWidthResource);
+		}
+		if ("dimen".equals(resources.getResourceTypeName(touchMarginResource))) {
+			this.touchMargin = resources.getDimensionPixelSize(touchMarginResource);
+		} else if ("integer".equals(resources.getResourceTypeName(touchMarginResource))) {
+			this.touchMargin = resources.getInteger(touchMarginResource);
 		}
 		if ("dimen".equals(resources.getResourceTypeName(labelWidthResource))) {
 			labelWidth = resources.getDimensionPixelSize(labelWidthResource);
@@ -104,54 +110,54 @@ class Item {
 		} else if ("integer".equals(resources.getResourceTypeName(labelTextSizeResource))) {
 			labelTextSize = resources.getDimensionPixelSize(labelTextSizeResource);
 		}
-		itemBackgroundDrawable = resources.getDrawable(itemBackgroundResource);
-		itemActiveBackgroundDrawable = resources.getDrawable(itemActiveBackgroundResource);
-		itemImageDrawable = resources.getDrawable(itemImageResource);
+		bodyBackgroundDrawable = resources.getDrawable(bodyBackgroundResource);
+		bodyActiveBackgroundDrawable = resources.getDrawable(bodyActiveBackgroundResource);
+		bodyImageDrawable = resources.getDrawable(bodyImageResource);
 		labelBackgroundDrawable = resources.getDrawable(labelBackgroundResource);
-		labelTextString = resources.getString(labelTextSizeResource);
+		labelTextString = resources.getString(labelTextResource);
 		highlightColor = resources.getColor(highlightColorResource);
 
-		this.labelTextString = resources.getString(labelTextResource);
-		this.highlightColor = resources.getColor(highlightColorResource);
-
-		paint.setTextSize(labelTextSize);
-		paint.setTextAlign(Paint.Align.CENTER);
-		paint.setColor(Color.WHITE);
-		Rect textBoundsRect = new Rect();
-		paint.getTextBounds(labelTextString, 0, labelTextString.length(), textBoundsRect);
-		int labelPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, resources.getDisplayMetrics());
-		labelTextWidth = textBoundsRect.width() + 2 * labelPadding;
 		if (labelWidth == -1) {
-			labelWidth = labelTextWidth;
+			paint.setTextSize(labelTextSize);
+			paint.setTextAlign(Paint.Align.CENTER);
+			paint.setColor(Color.WHITE);
+			Rect textBoundsRect = new Rect();
+			paint.getTextBounds(labelTextString, 0, labelTextString.length(), textBoundsRect);
+			int labelPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, resources.getDisplayMetrics());
+			labelWidth = textBoundsRect.width() + 2 * labelPadding;
 		}
 
-		this.width = Math.max(itemWidth, labelWidth);
-		this.height = itemHeight + labelBottomMargin + labelHeight;
+		this.width = Math.max(bodyWidth, labelWidth);
+		this.height = bodyHeight + labelBottomMargin + labelHeight;
+
+		bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		canvas.setBitmap(bitmap);
 	}
 
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
-	public void setCenter(int cx, int cy) {
-		this.cx = cx;
-		this.cy = cy;
+	public void setBodyCenter(int bodyCenterX, int bodyCenterY) {
+		this.bodyCenterX = bodyCenterX;
+		this.bodyCenterY = bodyCenterY;
 	}
 
-	public void draw(Canvas c) {
-		if (bitmap == null) {
-			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			canvas.setBitmap(bitmap);
-		}
+	/**
+	 * Do not modify this method
+	 * If you need to change drawing of this object
+	 * consider to change {@link Item#update()} or {@link Item#render()}
+	 */
+	public final void draw(Canvas c) {
 		update();
 		render();
 
-		srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		int left = (int) (cx - scale * bitmap.getWidth() / 2f);
-		int top = (int) (cy - (scale * (bitmap.getHeight() - itemHeight / 2)));
+		Rect srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		int left = (int) (bodyCenterX - scale * bitmap.getWidth() / 2f);
+		int top = (int) (bodyCenterY - (scale * (bitmap.getHeight() - bodyHeight / 2)));
 		int right = (int) (left + (bitmap.getWidth() * scale));
 		int bottom = (int) (top + (bitmap.getHeight() * scale));
-		dstRect = new Rect(left, top, right, bottom);
+		Rect dstRect = new Rect(left, top, right, bottom);
 		c.drawBitmap(bitmap, srcRect, dstRect, null);
 	}
 
@@ -174,25 +180,25 @@ class Item {
 //		}
 
 		int cx = (int) (bitmap.getWidth() / 2f);
-		int cy = (int) (bitmap.getHeight() - itemHeight / 2f);
+		int cy = (int) (bitmap.getHeight() - bodyHeight / 2f);
 
 		if (isSelected) {
-			int left = (int) (cx - itemWidth / 2f);
-			int top = (int) (cy - itemHeight / 2f);
-			itemActiveBackgroundDrawable.setColorFilter(highlightColor, PorterDuff.Mode.MULTIPLY);
-			itemActiveBackgroundDrawable.setBounds(left, top, left + itemWidth, top + itemHeight);
-			itemActiveBackgroundDrawable.draw(canvas);
+			int left = (int) (cx - bodyWidth / 2f);
+			int top = (int) (cy - bodyHeight / 2f);
+			bodyActiveBackgroundDrawable.setColorFilter(highlightColor, PorterDuff.Mode.MULTIPLY);
+			bodyActiveBackgroundDrawable.setBounds(left, top, left + bodyWidth, top + bodyHeight);
+			bodyActiveBackgroundDrawable.draw(canvas);
 		} else {
-			int left = (int) (cx - itemWidth / 2f);
-			int top = (int) (cy - itemHeight / 2f);
-			itemBackgroundDrawable.setBounds(left, top, left + itemWidth, top + itemHeight);
-			itemBackgroundDrawable.draw(canvas);
+			int left = (int) (cx - bodyWidth / 2f);
+			int top = (int) (cy - bodyHeight / 2f);
+			bodyBackgroundDrawable.setBounds(left, top, left + bodyWidth, top + bodyHeight);
+			bodyBackgroundDrawable.draw(canvas);
 		}
-		int itemPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, resources.getDisplayMetrics()); // Todo: change padding to be injected
-		int left = (int) (cx - (itemWidth - itemPadding) / 2f);
-		int top = (int) (cy - (itemHeight - itemPadding) / 2f);
-		itemImageDrawable.setBounds(left, top, left + itemWidth - itemPadding, top + itemHeight - itemPadding);
-		itemImageDrawable.draw(canvas);
+		int bodyPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, resources.getDisplayMetrics()); // Todo: change padding to be injected
+		int left = (int) (cx - (bodyWidth - bodyPadding) / 2f);
+		int top = (int) (cy - (bodyHeight - bodyPadding) / 2f);
+		bodyImageDrawable.setBounds(left, top, left + bodyWidth - bodyPadding, top + bodyHeight - bodyPadding);
+		bodyImageDrawable.draw(canvas);
 
 		if (labelScale > 0) {
 			int scaledLabelWidth = (int) (labelWidth * labelScale);
@@ -209,16 +215,16 @@ class Item {
 			Rect textBoundsRect = new Rect();
 			paint.getTextBounds(labelTextString, 0, labelTextString.length(), textBoundsRect);
 			paint.setColorFilter(null);
-			canvas.drawText(labelTextString, cx, cy - itemHeight / 2f - labelBottomMargin - labelHeight / 2f - textBoundsRect.exactCenterY(), paint);
+			canvas.drawText(labelTextString, cx, cy - bodyHeight / 2f - labelBottomMargin - labelHeight / 2f - textBoundsRect.exactCenterY(), paint);
 		}
 	}
 
-	public int getCx() {
-		return cx;
+	public int getBodyCenterX() {
+		return bodyCenterX;
 	}
 
-	public int getCy() {
-		return cy;
+	public int getBodyCenterY() {
+		return bodyCenterY;
 	}
 
 	public int getWidth() {
@@ -354,9 +360,9 @@ class Item {
 	}
 
 	public boolean inCircle(int x, int y) {
-		int dx = x - this.cx;
-		int dy = y - this.cy;
-		return Math.sqrt(dx * dx + dy * dy) <= scale * itemWidth / 2f + touchMargin;
+		int dx = x - this.bodyCenterX;
+		int dy = y - this.bodyCenterY;
+		return Math.sqrt(dx * dx + dy * dy) <= scale * bodyWidth / 2f + touchMargin;
 	}
 
 	public boolean isScaled() {

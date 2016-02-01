@@ -288,8 +288,9 @@ public class Sunshine implements View.OnTouchListener, Core.OnItemSelectListener
 			@ColorRes int highlightColor,
 			String tag) {
 		core.addItem(
-				R.dimen.item_width,
-				R.dimen.item_height,
+				R.dimen.body_width,
+				R.dimen.body_height,
+				R.dimen.touch_margin,
 				R.integer.label_width,
 				R.dimen.label_height,
 				R.dimen.label_bottom_margin,

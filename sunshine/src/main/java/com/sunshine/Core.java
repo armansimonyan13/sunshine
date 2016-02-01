@@ -16,7 +16,6 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.StringRes;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -134,13 +133,13 @@ class Core extends View implements Item.Parent {
 
 		for (int i = 0; i < items.size(); i++) {
 			Item item = items.get(i);
-			double itemCenterAngle = normalizeAngle(Math.atan2(item.getCy() - originY, item.getCx() - originX));
+			double itemCenterAngle = normalizeAngle(Math.atan2(item.getBodyCenterY() - originY, item.getBodyCenterX() - originX));
 			double itemStartAngle = itemCenterAngle - SEGMENT_ANGLE_RADIAN / 2f;
 			double itemFinishAngle = itemCenterAngle + SEGMENT_ANGLE_RADIAN / 2f;
 			boolean inCurrentSegment;
 			if (itemStartAngle < angle && angle < itemFinishAngle) {
-				int dx = x - item.getCx();
-				int dy = y - item.getCy();
+				int dx = x - item.getBodyCenterX();
+				int dy = y - item.getBodyCenterY();
 				double distance = Math.sqrt(dx * dx + dy * dy);
 				float scale = (float) (MAX_SCALE - (MAX_SCALE - 1) * distance / MAX_RADIUS);
 				if (scale < 1) {
@@ -232,7 +231,7 @@ class Core extends View implements Item.Parent {
 		paint.setStrokeWidth(1);
 		paint.setAntiAlias(true);
 		for (int i = 0; i < items.size(); i++) {
-			canvas.drawLine(originX, originY, items.get(i).getCx(), items.get(i).getCy(), paint);
+			canvas.drawLine(originX, originY, items.get(i).getBodyCenterX(), items.get(i).getBodyCenterY(), paint);
 		}
 	}
 
@@ -251,10 +250,11 @@ class Core extends View implements Item.Parent {
 	public void addItem(
 			@DimenRes @IntegerRes int itemWidthResource,
 			@DimenRes @IntegerRes int itemHeightResource,
+			@DimenRes @IntegerRes int touchMarginResource,
 			@DimenRes @IntegerRes int labelWidthResource,
 			@DimenRes @IntegerRes int labelHeightResource,
 			@DimenRes @IntegerRes int labelBottomMarginResource,
-			@DimenRes @IntegerRes int textSizeResource,
+			@DimenRes @IntegerRes int labelTextSizeResource,
 			@DrawableRes int itemBackgroundResource,
 			@DrawableRes int itemActiveBackgroundResource,
 			@DrawableRes int itemImageResource,
@@ -267,17 +267,17 @@ class Core extends View implements Item.Parent {
 				getResources(),
 				itemWidthResource,
 				itemHeightResource,
+				touchMarginResource,
 				labelWidthResource,
 				labelHeightResource,
 				labelBottomMarginResource,
-				textSizeResource,
+				labelTextSizeResource,
 				itemBackgroundResource,
 				itemActiveBackgroundResource,
 				itemImageResource,
 				labelBackgroundResource,
 				labelTextResource,
 				highlightColor,
-				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics()),
 				tag
 		));
 
@@ -350,7 +350,7 @@ class Core extends View implements Item.Parent {
 			int centerX = (int) (originX + radius * Math.cos(angle));
 			int centerY = (int) (originY + radius * Math.sin(angle));
 			item = items.get(i);
-			item.setCenter(centerX, centerY);
+			item.setBodyCenter(centerX, centerY);
 		}
 	}
 
