@@ -57,6 +57,7 @@ class Core extends View implements Item.Parent {
 	private boolean isOpened;
 	private List<Item> items = new ArrayList<>();
 	private OnItemSelectListener onItemSelectListener;
+	private int selectedItemIndex;
 
 	public Core(Context context, int itemRadius, int maxRadius, float itemSegment) {
 		super(context);
@@ -192,36 +193,30 @@ class Core extends View implements Item.Parent {
 		canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
 		if (reversedOrder) {
-			Item selectedItem = null;
 			for (int i = items.size() - 1; i >= 0; i--) {
 				Item item = items.get(i);
 				item.setIndex(i);
 				if (item.isSelected()) {
-					selectedItem = item;
+					selectedItemIndex = i;
 				} else {
 					item.draw(canvas);
 				}
 			}
-			if (selectedItem != null) {
-				selectedItem.draw(canvas);
-			}
+			items.get(selectedItemIndex).draw(canvas);
 		} else {
-			Item selectedItem = null;
 			for (int i = 0; i < items.size(); i++) {
 				Item item = items.get(i);
 				item.setIndex(i);
 				if (item.isSelected()) {
-					selectedItem = item;
+					selectedItemIndex = i;
 				} else {
 					item.draw(canvas);
 				}
 			}
-			if (selectedItem != null) {
-				selectedItem.draw(canvas);
-			}
+			items.get(selectedItemIndex).draw(canvas);
 		}
 
-		renderLines(canvas);
+//		renderLines(canvas);
 	}
 
 	private boolean isInOrigin(int x, int y) {
@@ -282,7 +277,7 @@ class Core extends View implements Item.Parent {
 				labelBackgroundResource,
 				labelTextResource,
 				highlightColor,
-				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics()),
+				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics()),
 				tag
 		));
 
@@ -305,11 +300,18 @@ class Core extends View implements Item.Parent {
 				reversedOrder = false;
 			}
 		} else if (tooCloseToLeftEdge()) {
-			startAngle = (float) (Math.PI + Math.acos((originX - offsetX) / MAX_RADIUS));
+			float acos = (originX - offsetX) / MAX_RADIUS;
+			if (acos < -1) {
+				acos++;
+			}
+			startAngle = (float) (Math.PI + Math.acos(acos));
 			reversedOrder = false;
 		} else if (tooCloseToRightEdge()) {
-			startAngle = (float) ((2 * Math.PI - Math.acos((getParentWidth() - originX - offsetX) / MAX_RADIUS))
-					- (items.size() - 1) * SEGMENT_ANGLE_RADIAN);
+			float acos = (getParentWidth() - originX - offsetX) / MAX_RADIUS;
+			if (acos < -1) {
+				acos++;
+			}
+			startAngle = (float) ((2 * Math.PI - Math.acos(acos)) - (items.size() - 1) * SEGMENT_ANGLE_RADIAN);
 			reversedOrder = true;
 		} else {
 			reversedOrder = false;
