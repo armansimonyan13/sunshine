@@ -128,7 +128,7 @@ class Ray {
 			paint.setColor(Color.WHITE);
 			Rect textBoundsRect = new Rect();
 			paint.getTextBounds(labelTextString, 0, labelTextString.length(), textBoundsRect);
-			int labelPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, resources.getDisplayMetrics());
+			int labelPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, resources.getDisplayMetrics());
 			labelWidth = textBoundsRect.width() + 2 * labelPadding;
 		}
 
